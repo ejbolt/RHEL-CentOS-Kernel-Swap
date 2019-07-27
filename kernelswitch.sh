@@ -74,11 +74,21 @@ then
         mv /tmp/grub.cfg /etc/default/grub
 fi
 
-echo "Updating GRUB"
-echo -n "Enter GRUB config path (default: /boot/efi/EFI/centos/grub.cfg): "
+if [ -f "$EFI_SYSTEM" ]
+then
+    echo "EFI system detected, setting default GRUB path"
+    DEFAULT_GRUB_PATH="/boot/efi/EFI/centos/grub.cfg"
+else
+    echo "System uses BIOS, setting default GRUB path"
+    DEFAULT_GRUB_PATH="/boot/grub2/grub.cfg"
+fi
+
+
+echo -n "Enter GRUB config path (default: ${DEFAULT_GRUB_PATH}): "
 read GRUB_PATH
-GRUB_PATH=${GRUB_PATH:-"/boot/efi/EFI/centos/grub.cfg"}
-grub2-mkconfig -o /boot/efi/EFI/centos/grub.cfg
+GRUB_PATH=${GRUB_PATH:-"${DEFAULT_GRUB_PATH}"}
+echo "${GRUB_PATH}"
+grub2-mkconfig -o "${GRUB_PATH}"
 
 echo -n "You must reboot for to use the newer kernel, do so now? (y/N): "
 read RESTARTNOW
